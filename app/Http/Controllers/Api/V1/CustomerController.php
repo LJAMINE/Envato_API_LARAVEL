@@ -33,7 +33,7 @@ return Customer::all();
     public function store(StoreCustomerRequest $request)
     {
         //
-    }
+    }  
 
     /**
      * Display the specified resource.
