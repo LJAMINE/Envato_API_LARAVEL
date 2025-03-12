@@ -7,47 +7,37 @@ use Illuminate\Http\Request;
 class  ApiFilter
 {
 
-    protected $safeParms = [
+    protected $safeParms = [];
 
-        
-    ];
+    protected $columnMap = [];
 
-    protected $columnMap=[
-    ];
+    protected $operatorMap = [];
 
-    protected $operatorMap=[
+    public function transform(Request $request)
+    {
 
-       
+        $eloQuery = [];
 
-    ];
+        foreach ($this->safeParms as $parms => $operators) {
 
-public function transform(Request $request){
+            $query = $request->query($parms);
 
-$eloQuery=[];
-
-foreach ($this->safeParms as $parms => $operators) {
-
-$query=$request->query($parms);
-
-if (!isset($query)) {
-    continue;
-}
+            if (!isset($query)) {
+                continue;
+            }
 
 
-$column=$this->columnMap [$parms] ?? $parms;
+            $column = $this->columnMap[$parms] ?? $parms;
 
-foreach ($operators as $operator) {
+            foreach ($operators as $operator) {
 
-    if (isset($query[$operator])) {
-        $eloQuery[]=[$column,$this->operatorMap [$operator],$query[$operator]];
+                if (isset($query[$operator])) {
+                    $eloQuery[] = [$column, $this->operatorMap[$operator], $query[$operator]];
+                }
+            }
+        }
+
+
+        return $eloQuery;
     }
-
-}
-
-}
-
-
-return $eloQuery;
-
-}
 }
