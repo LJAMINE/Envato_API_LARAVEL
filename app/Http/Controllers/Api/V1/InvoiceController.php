@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\InvoiceCollection;
 use App\Http\Resources\V1\InvoiceResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class InvoiceController extends Controller
 {
@@ -21,14 +22,27 @@ class InvoiceController extends Controller
         $filter = new invoicesFilter();
         $queryItems = $filter->transform($request);
 
-        if (count($queryItems)==0) {
+        if (count($queryItems) == 0) {
 
             return new InvoiceCollection(Invoice::paginate());
         } else {
 
-            $invoices=Invoice::where($queryItems)->paginate();
+            $invoices = Invoice::where($queryItems)->paginate();
             return new InvoiceCollection($invoices->appends($request->query()));
         }
+    }
+
+
+
+    public function bulkStore(Request $request)
+    {
+
+        $bulk = collect($request->all())->map(function ($arr, $key) {
+
+            return Arr::except($arr, ['customerId', 'billed', 'paidDate']);
+        });
+
+        Invoice::insert($bulk->toArray());
     }
 
     /**
@@ -53,7 +67,6 @@ class InvoiceController extends Controller
     public function show(Invoice $invoice)
     {
         return  new InvoiceResource($invoice);
-        
     }
 
     /**
